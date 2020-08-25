@@ -17,6 +17,6 @@ function getA(html) {
 	dom("[href]").each(function(i, elem) {
 	  	let res = dom(this).attr('href')
 	  	console.log(res)
-
+	  	
 	})	
 }
