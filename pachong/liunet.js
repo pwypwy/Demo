@@ -59,7 +59,7 @@ let funStr =
 `
 plugin.axios.get(data)
   .then(response => {
-  	console.log("response.data");
+  	//console.log("response.data");
     getA(response.data)
 
   })
@@ -82,8 +82,12 @@ function getA(html) {
 			
 			if(res.includes('.png')){
 				console.log(res)
-			    let filename = (Date.now())+'test.png';
-			    plugin.request(res).pipe(plugin.fs.createWriteStream("./image/" + filename));
+			    let filename = res.split('-')[2];//+'test.png';
+				let path = "./image/bb/"
+				 if(!plugin.fs.existsSync(path)) {
+				 	plugin.fs.mkdirSync(path);
+				 }
+			    plugin.request(res).pipe(plugin.fs.createWriteStream(path + filename));
 			}
 		}	  	
 	})
@@ -103,7 +107,7 @@ function test() {
 
 	function myFunc(arg) {
 	  for (var i = 3 - 1; i >= 0; i--) {
-	  	publisher.publish("a", 'https://blog.csdn.net/q282176713/article/details/80580886')
+	  	publisher.publish("a", 'https://www.cnblogs.com/muou2125/p/11652193.html')
 	  }
 	  console.log("发完了!!!!!!")
 	}
