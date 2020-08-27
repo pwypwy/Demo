@@ -8,11 +8,19 @@ client.get('hello',function (err,v) {
     console.log(`redis get hello v: ${v}`);
 })
 
-function test(argument) {
-	console.log("ooooooooo")
+client.del('r3');
+for (var i = 10000- 1; i >= 0; i--) {
+	client.send_command('PFADD',['r3','https://www.runoob.com/jsref/jsref-substr.html'+i],function(argument) {
+		//console.log('PFADD  ')
+	})
 }
 
-console.log(test.toString())
 
-var f = new Function(test.toString())
-f(1)
+
+client.send_command('PFCOUNT',['r3'],function(a,data) {
+	console.log('PFCOUNT:  '+data)
+	//console.log(arguments)
+})
+// client.get('r3',function (err,v) {
+//     console.log(`redis get hello v: ${v}`);
+// });
