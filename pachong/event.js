@@ -63,3 +63,31 @@ emitter.on('e', function(arg1) {
 for (var i = 10- 1; i >= 0; i--) {
 	emitter.emit('a', i); 
 }
+
+function ron(k,f) {
+
+	//异常捕捉
+	var nf = function(data) {
+		try{
+			f(data)
+		}catch(err){
+			emitter.emit(k+"-err", {data,err})
+		}
+	}
+	emitter.on(k, nf)
+}
+
+function remit(k,data) {
+	if(redish.SISMEMBER(k,data)==1){
+		return
+	}
+	redis.push(k,data)
+	emitter.emit(k, data)
+}
+
+function restart(k) {
+	let list = redis.SMEMBERS(k)
+	for(let e of list){
+		emitter.emit(k, e)
+	}
+}
