@@ -1,5 +1,6 @@
 const events = require('events'); 
 const child_process = require('child_process');
+var redis = require('redis');
 const emitter = new events.EventEmitter(); 
 
 
@@ -8,34 +9,38 @@ emitter.on('a', function(arg1) {
     emitter.emit('b', arg1)
 })
 
-//初始化事件  cahceUrl -> allowUrl -> page/img/
-emitter.on('cahceUrl', function(url) { 
-    console.log('cahceUrl: '+arg1); 
-    if(url.startsWith("http")&&url.indludes("/")){
-    	if(url.indludes("")){
 
-    	}else if(url.indludes("")){
+var evenet = {
+	init(domain,client){
+		return {
+			domain,
+			client,
+			nodes:[],
+			on(key,fun){
+				var nf = function(data){
+					try{
+						fun(data)
+					}catch(e){
+						//记录错误信息
+					}
+				}
+				emitter.on(key,nf)
+				client.sadd(domain+"-")
+			},
+			emit(key,data){
+				emitter.emit(key, data)
+				//数据备份
+			},
+			restart(key,num){
+				if(num&&num>0){
 
-    	}else if(url.indludes("")){
-    		
-    	}
-
-    }
-    emitter.emit('b', arg1)
-})
-
-
-//page -> category/theme/content
-//content -> html -> dom -> img/url
-//类型判断 分流器 过滤器
-//url过滤
-
-
-//页面类型
-//目录页面处理(多级目录)
-//主题页面处理
-//内容页面处理
-//资源抓取
-
-//图片类型
-//获取主题,资源保存
+				}else{
+					//查询数据 遍历重试
+					for (let data of datas) {
+						emitter.emit(key,data)
+					}			
+				}
+			}
+		}
+	}
+}
