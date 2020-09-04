@@ -14,8 +14,10 @@ var evenet = {
 
 					try{
 						let flag = fun(data)
-						if(flag==false){						
-							client.sadd(domain+"-"+key+"-fail",data)														
+						if(flag==false){												
+							setTimeout(function(){
+								client.sadd(domain+"-"+key+"-fail",data)
+							}, 500)														
 						}else{
 							client.srem(domain+"-"+key+"-fail",data)
 						}
@@ -24,10 +26,11 @@ var evenet = {
 						client.sadd(domain+"-"+key+"-err",{data,err})
 						
 						//记作消费失败
-						setTimeout(del, 200)
+						client.sadd(domain+"-"+key+"-fail",data)
+						//setTimeout(del, 200)
 					}
 				}
-				emitter.on(key,nf)
+				emitter.on(domain+"-"+key,nf)
 				client.sadd(domain+"-nodes",domain+"-"+key)
 				client.sadd(domain+"-nodes",domain+"-"+key+"-fail")
 				client.sadd(domain+"-nodes",domain+"-"+key+"-err")
@@ -60,9 +63,10 @@ var evenet = {
 			
 				}
 			},
+			//重试消费失败的数据
 			retry(key,num){
-				var f = function(err, datas){				
-						for (let data of datas) {
+				var f = function(err, datas){
+						for (let data of datas) {						
 							emitter.emit(domain+"-"+key,data)
 						}
 					}
@@ -73,6 +77,21 @@ var evenet = {
 					client.smembers(domain+"-"+key+"-fail",f)
 			
 				}
+			},
+			getNodes(fun){
+			     client.smembers(domain+"-nodes",fun)
+			},
+			//通过主题获取数据
+			get(key,fun){
+				client.smembers(domain+"-"+key,fun)
+			},
+			//获取消费失败的数据
+			getFail(key,fun){
+				client.smembers(domain+"-"+key+"-fail",fun)
+			},
+			//获取消费异常的数据
+			getErr(key,fun){
+				client.smembers(domain+"-"+key+"-err",fun)
 			},
 			clean(key){
 				if(key){
